@@ -7,7 +7,7 @@ packages = ["ucbl_logger"]
 
 [project]
 name = "ucbl-logger"
-version = "1.0.2"
+version = "1.0.3"
 description = "A User-Centric Behaviour Log Markup Language Logger"
 readme = "README.md"
 requires-python = ">=3.6"
