@@ -10,7 +10,7 @@ name = "ucbl-logger"
 version = "1.0.4"
 description = "A User-Centric Behaviour Log Markup Language Logger"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.11"
 license = "CC-BY-NC-ND-4.0"
 authors = [
     {name = "Evan Erwee", email = "evan@erwee.com"},
@@ -36,6 +36,7 @@ test = [
     "pytest>=6.0",
     "pytest-cov>=2.0",
     "pytest-mock>=3.0",
+    "moto[eks,ec2]>=4.0.0",
 ]
 eks = [
     "opentelemetry-api>=1.0.0",
