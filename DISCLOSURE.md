@@ -42,7 +42,7 @@ Want to contribute? Check out our contribution guidelines!
 
 Please submit all issues, bug reports, and enhancement requests through our GitHub Issues page:
 
-**[🔗 Submit an Issue](https://github.com/your-org/ucbl-logger/issues/new/choose)**
+**[🔗 Submit an Issue](https://github.com/RW-Lab/UCBL-logger/issues/new/choose)**
 
 ---
 
