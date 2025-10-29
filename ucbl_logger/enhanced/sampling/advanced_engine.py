@@ -180,7 +180,10 @@ class AdvancedSamplingEngine(ISamplingEngine):
         # Adjust rate based on current volume and trend
         if current_volume > self.config.volume_threshold:
             # High volume detected
-            volume_pressure = min(current_volume / self.config.volume_threshold, 10.0)
+            if self.config.volume_threshold == 0:
+                volume_pressure = 10.0
+            else:
+                volume_pressure = min(current_volume / self.config.volume_threshold, 10.0)
             rate_reduction = math.log(volume_pressure) * self.config.adaptive_adjustment_factor
             
             # Apply trend factor

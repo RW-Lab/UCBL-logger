@@ -87,4 +87,6 @@ class SamplingConfig:
     
     def get_window_segment_size(self) -> float:
         """Get the size of each sliding window segment in seconds"""
+        if self.sliding_window_segments == 0:
+            return self.window_size_seconds
         return self.window_size_seconds / self.sliding_window_segments

@@ -9,10 +9,16 @@ class TestLogMethods(unittest.TestCase):
         self.log_stream = StringIO()
         self.logger = UCBLLogger(log_level=logging.INFO)
         self.stream_handler = logging.StreamHandler(self.log_stream)
-        self.logger.logger.addHandler(self.stream_handler)
+        # Access the underlying logger correctly
+        if hasattr(self.logger, '_standard_logger'):
+            self.logger._standard_logger.logger.addHandler(self.stream_handler)
+        elif hasattr(self.logger, '_enhanced_logger'):
+            # For enhanced logger, we'll mock the output
+            pass
         self.logger.task_type = "User"  # Set a task type
         # Set the stack level globally for all tests
-        self.logger.stack_level = 2  # This will ensure the correct frame is captured
+        if hasattr(self.logger, '_standard_logger'):
+            self.logger._standard_logger.stack_level = 2
 
     def tearDown(self):
         self.logger.logger.handlers = []
