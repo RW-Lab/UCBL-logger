@@ -358,5 +358,5 @@ Together, we can build something amazing! 🚀
 
 ---
 
-*Last Updated: December 2024*
-*Version: 1.0.0*
+*Last Updated: October 2025*
+*Version: 1.0.1*
