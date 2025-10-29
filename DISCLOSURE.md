@@ -301,9 +301,9 @@ For critical production issues:
 3. **Performance Issues**: Include detailed metrics and profiling data
 
 ### 📧 Direct Contact
-- **General Questions**: discussions@your-org.com
-- **Security Issues**: security@your-org.com
-- **Partnership Inquiries**: partnerships@your-org.com
+- **General Questions**: evan@erwee.com
+- **Security Issues**: evan@erwee.com
+- **Partnership Inquiries**: evan@erwee.com
 
 ---
 
