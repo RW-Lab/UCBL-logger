@@ -30,3 +30,14 @@ dependencies = [
     "psutil>=5.8.0",
     "boto3>=1.26.0",
 ]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0",
+    "pytest-cov>=2.0",
+    "pytest-mock>=3.0",
+]
+eks = [
+    "opentelemetry-api>=1.0.0",
+    "prometheus-client>=0.14.0",
+]
