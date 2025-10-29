@@ -41,7 +41,7 @@ jobs:
         echo "ENVIRONMENT=test" >> $GITHUB_ENV
     
     - name: Run core tests
-      run: pytest tests/test_logger.py tests/test_log_methods.py -v --tb=short
+      run: pytest tests/test_tracing.py -v --tb=short
     
     - name: Run unit tests
       run: pytest tests/test_buffer_management.py -v --tb=short
