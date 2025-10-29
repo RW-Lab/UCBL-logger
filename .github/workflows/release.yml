@@ -57,7 +57,7 @@ jobs:
         echo "Test execution completed"
     
     - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       if: matrix.python-version == '3.11'
       with:
         fail_ci_if_error: false
@@ -72,7 +72,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
     
     - name: Install build dependencies
       run: |
