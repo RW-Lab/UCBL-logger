@@ -37,9 +37,8 @@ jobs:
       run: |
         echo "SKIP_AWS_TESTS=true" >> $GITHUB_ENV
         echo "SKIP_K8S_TESTS=true" >> $GITHUB_ENV
+        echo "UCBL_DISABLE_EKS_FEATURES=true" >> $GITHUB_ENV
         echo "ENVIRONMENT=test" >> $GITHUB_ENV
-        echo "KUBERNETES_NAMESPACE=test-namespace" >> $GITHUB_ENV
-        echo "HOSTNAME=test-pod" >> $GITHUB_ENV
     
     - name: Run core tests
       run: pytest tests/test_logger.py tests/test_log_methods.py -v --tb=short
