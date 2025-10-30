@@ -348,16 +348,15 @@ class EnhancedEKSLogger(EnhancedEKSLoggerBase):
             return
         
         try:
-            # Pass metadata to tracing manager if it supports it
-            if hasattr(self._tracing_manager, 'end_trace') and metadata:
-                # Try to pass metadata if the tracing manager supports it
-                try:
-                    self._tracing_manager.end_trace(correlation_id, success, metadata=metadata)
-                except TypeError:
-                    # Fallback if tracing manager doesn't support metadata
-                    self._tracing_manager.end_trace(correlation_id, success)
-            else:
-                self._tracing_manager.end_trace(correlation_id, success)
+            # Log metadata if provided
+            if metadata:
+                self._python_logger.debug(f"Trace metadata: {metadata}", extra={
+                    'correlation_id': correlation_id,
+                    'metadata': metadata
+                })
+            
+            # Call tracing manager without metadata parameter (it doesn't support it)
+            self._tracing_manager.end_trace(correlation_id, success)
         except Exception as e:
             self._python_logger.debug(f"Failed to end trace: {e}")
     

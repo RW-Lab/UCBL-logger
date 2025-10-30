@@ -103,8 +103,8 @@ class EnhancedEKSLoggerBase(IEnhancedEKSLogger):
         pass
     
     @abstractmethod
-    def end_trace(self, correlation_id: str, success: bool = True) -> None:
-        """End a trace"""
+    def end_trace(self, correlation_id: str, success: bool = True, metadata: Optional[Dict[str, Any]] = None) -> None:
+        """End a trace with optional metadata"""
         pass
     
     # Performance monitoring methods (abstract - to be implemented by concrete class)

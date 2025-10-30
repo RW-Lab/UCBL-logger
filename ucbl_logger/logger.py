@@ -278,10 +278,10 @@ class UCBLLogger:
             return self._enhanced_logger.start_trace(operation_name)
         return None
     
-    def end_trace(self, correlation_id: str, success: bool = True) -> None:
+    def end_trace(self, correlation_id: str, success: bool = True, metadata: Optional[Dict[str, Any]] = None) -> None:
         """End distributed trace (enhanced feature)"""
         if self._enhanced_logger:
-            self._enhanced_logger.end_trace(correlation_id, success)
+            self._enhanced_logger.end_trace(correlation_id, success, metadata)
     
     def log_performance_metrics(self) -> None:
         """Log current performance metrics (enhanced feature)"""
