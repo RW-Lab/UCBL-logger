@@ -155,7 +155,7 @@ class EnhancedEKSLogger(EnhancedEKSLoggerBase):
                     self._security_logger = BaseSecurityContextLogger()
                 
                 # Initialize CloudWatch handler
-                if self.enable_cloudwatch:
+                if self.enable_cloudwatch and self.cloudwatch_config:
                     self._cloudwatch_handler = EnhancedCloudWatchHandler(
                         config=self.cloudwatch_config
                     )
