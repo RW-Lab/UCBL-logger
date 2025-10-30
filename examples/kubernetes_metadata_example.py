@@ -238,12 +238,12 @@ def main():
         
         secrets = deployment_metadata.get('secrets', [])
         if secrets:
-            print(f"Secrets: {len(secrets)} found")
-            for secret in secrets:
-                secret_name = secret.get('name', 'N/A')
-                secret_type = secret.get('type', 'N/A')
-                data_keys = secret.get('data_keys', [])
-                print(f"  - {secret_name} ({secret_type}): {len(data_keys)} keys")
+            print(f"Secrets: {len(secrets)} found (details redacted)")
+            # Details of secrets are redacted for security reasons.
+            # If you must log secret metadata, use only generic, non-identifying info.
+            # for secret in secrets:
+            #     ... # (redacted)
+            #     print("  - [REDACTED]")
                 
     except Exception as e:
         print(f"Error collecting deployment metadata: {e}")
