@@ -342,13 +342,22 @@ class EnhancedEKSLogger(EnhancedEKSLoggerBase):
             import uuid
             return f"{self.service_name}-{uuid.uuid4().hex[:8]}"
     
-    def end_trace(self, correlation_id: str, success: bool = True) -> None:
-        """End a trace"""
+    def end_trace(self, correlation_id: str, success: bool = True, metadata: Optional[Dict[str, Any]] = None) -> None:
+        """End a trace with optional metadata"""
         if not self._tracing_manager:
             return
         
         try:
-            self._tracing_manager.end_trace(correlation_id, success)
+            # Pass metadata to tracing manager if it supports it
+            if hasattr(self._tracing_manager, 'end_trace') and metadata:
+                # Try to pass metadata if the tracing manager supports it
+                try:
+                    self._tracing_manager.end_trace(correlation_id, success, metadata=metadata)
+                except TypeError:
+                    # Fallback if tracing manager doesn't support metadata
+                    self._tracing_manager.end_trace(correlation_id, success)
+            else:
+                self._tracing_manager.end_trace(correlation_id, success)
         except Exception as e:
             self._python_logger.debug(f"Failed to end trace: {e}")
     
