@@ -61,8 +61,64 @@ class RuntimeSecurityMonitor:
             'container_escape_detection': True
         }
         
+        # Initialize whitelist configuration
+        self._init_whitelist_config()
+        
         # Initialize monitoring tools
         self._init_monitoring_tools()
+    
+    def _init_whitelist_config(self) -> None:
+        """Initialize security whitelist configuration from environment variables"""
+        # Kubernetes-aware mode
+        self.kubernetes_mode = os.getenv('UCBL_SECURITY_KUBERNETES_MODE', 'true').lower() == 'true'
+        
+        # Default Kubernetes whitelists
+        self.k8s_allowed_mounts = {
+            '/run/secrets/kubernetes.io/serviceaccount',
+            '/run/secrets/eks.amazonaws.com/serviceaccount',
+            '/var/run/secrets/kubernetes.io',
+            '/var/run/secrets/istio',
+            '/etc/istio',
+            '/tmp',
+            '/var/tmp',
+            '/proc',
+            '/sys',
+            '/dev/shm'
+        }
+        
+        self.k8s_allowed_fs_types = {'overlay', 'tmpfs', 'proc', 'sysfs', 'devtmpfs'}
+        
+        self.k8s_allowed_devices = {'overlay', 'tmpfs', 'proc', 'sysfs', 'devtmpfs', 'shm'}
+        
+        # User-defined whitelists (override/extend defaults)
+        custom_mounts = os.getenv('UCBL_SECURITY_ALLOWED_MOUNTS', '')
+        if custom_mounts:
+            self.allowed_mounts = set(custom_mounts.split(','))
+        elif self.kubernetes_mode:
+            self.allowed_mounts = self.k8s_allowed_mounts
+        else:
+            self.allowed_mounts = set()
+        
+        custom_fs_types = os.getenv('UCBL_SECURITY_ALLOWED_FS_TYPES', '')
+        if custom_fs_types:
+            self.allowed_fs_types = set(custom_fs_types.split(','))
+        elif self.kubernetes_mode:
+            self.allowed_fs_types = self.k8s_allowed_fs_types
+        else:
+            self.allowed_fs_types = set()
+        
+        custom_devices = os.getenv('UCBL_SECURITY_ALLOWED_DEVICES', '')
+        if custom_devices:
+            self.allowed_devices = set(custom_devices.split(','))
+        elif self.kubernetes_mode:
+            self.allowed_devices = self.k8s_allowed_devices
+        else:
+            self.allowed_devices = set()
+        
+        self.logger.info(f"Security whitelist initialized (K8s mode: {self.kubernetes_mode})")
+        self.logger.debug(f"Allowed mounts: {len(self.allowed_mounts)} entries")
+        self.logger.debug(f"Allowed FS types: {self.allowed_fs_types}")
+        self.logger.debug(f"Allowed devices: {self.allowed_devices}")
     
     def _init_monitoring_tools(self) -> None:
         """Initialize available security monitoring tools"""
@@ -318,6 +374,10 @@ class RuntimeSecurityMonitor:
             ]
             
             for indicator in escape_indicators:
+                # Skip whitelisted paths
+                if self._is_path_whitelisted(indicator['path']):
+                    continue
+                
                 if Path(indicator['path']).exists():
                     # Check if we can access it (indicates potential escape)
                     try:
@@ -339,28 +399,30 @@ class RuntimeSecurityMonitor:
             # Better check: Detect if we're in host PID namespace (real escape indicator)
             # In a normal container, PID 1 is the container's init process
             # In host PID namespace or after escape, PID 1 is the host's init
-            try:
-                # Read PID 1's command line
-                with open('/proc/1/cmdline', 'r') as f:
-                    pid1_cmd = f.read().replace('\x00', ' ').strip()
-                
-                # Host init processes (systemd, init, etc.)
-                host_init_indicators = ['/sbin/init', 'systemd', '/lib/systemd/systemd']
-                
-                # Check if PID 1 is a host init process
-                if any(indicator in pid1_cmd for indicator in host_init_indicators):
-                    self._create_security_alert(
-                        alert_type='container_escape_attempt',
-                        severity='CRITICAL',
-                        description='Host PID namespace detected - potential container escape',
-                        source='escape_detector',
-                        metadata={
-                            'pid1_command': pid1_cmd,
-                            'access_time': time.time()
-                        }
-                    )
-            except (PermissionError, FileNotFoundError, OSError):
-                pass
+            # Skip this check in Kubernetes mode as it causes false positives
+            if not self.kubernetes_mode:
+                try:
+                    # Read PID 1's command line
+                    with open('/proc/1/cmdline', 'r') as f:
+                        pid1_cmd = f.read().replace('\x00', ' ').strip()
+                    
+                    # Host init processes (systemd, init, etc.)
+                    host_init_indicators = ['/sbin/init', 'systemd', '/lib/systemd/systemd']
+                    
+                    # Check if PID 1 is a host init process
+                    if any(indicator in pid1_cmd for indicator in host_init_indicators):
+                        self._create_security_alert(
+                            alert_type='container_escape_attempt',
+                            severity='CRITICAL',
+                            description='Host PID namespace detected - potential container escape',
+                            source='escape_detector',
+                            metadata={
+                                'pid1_command': pid1_cmd,
+                                'access_time': time.time()
+                            }
+                        )
+                except (PermissionError, FileNotFoundError, OSError):
+                    pass
         
         except Exception as e:
             self.logger.debug(f"Error detecting container escape attempts: {e}")
@@ -394,6 +456,27 @@ class RuntimeSecurityMonitor:
     def clear_security_events(self) -> None:
         """Clear collected security events"""
         self._security_events.clear()
+    
+    def _is_path_whitelisted(self, path: str) -> bool:
+        """Check if a path is whitelisted"""
+        # Check exact match
+        if path in self.allowed_mounts:
+            return True
+        
+        # Check if path starts with any whitelisted mount
+        for allowed_mount in self.allowed_mounts:
+            if path.startswith(allowed_mount):
+                return True
+        
+        return False
+    
+    def _is_fs_type_whitelisted(self, fs_type: str) -> bool:
+        """Check if a filesystem type is whitelisted"""
+        return fs_type in self.allowed_fs_types
+    
+    def _is_device_whitelisted(self, device: str) -> bool:
+        """Check if a device is whitelisted"""
+        return device in self.allowed_devices
 
 
 class PolicyViolationDetector:
