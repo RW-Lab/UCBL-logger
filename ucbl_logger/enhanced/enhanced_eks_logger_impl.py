@@ -130,8 +130,7 @@ class EnhancedEKSLogger(EnhancedEKSLoggerBase):
                 # Initialize tracing manager
                 if self.enable_tracing:
                     self._tracing_manager = BaseTracingManager(
-                        service_name=self.service_name,
-                        namespace=self.namespace
+                        service_name=self.service_name
                     )
                 
                 # Initialize metadata collector
