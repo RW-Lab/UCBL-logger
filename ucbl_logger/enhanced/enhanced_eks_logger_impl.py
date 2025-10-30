@@ -161,18 +161,36 @@ class EnhancedEKSLogger(EnhancedEKSLoggerBase):
                     )
                 
                 # Initialize buffer manager (always needed for reliability)
+                # Create delivery function that uses CloudWatch handler if available
+                delivery_func = None
+                if self._cloudwatch_handler:
+                    delivery_func = lambda log_entry: self._cloudwatch_handler.send_log(log_entry)
+                
                 self._buffer_manager = EnhancedBufferManager(
                     config=self.buffer_config,
-                    cloudwatch_handler=self._cloudwatch_handler
+                    delivery_func=delivery_func
                 )
                 
                 # Initialize health monitor
                 if self.enable_health_monitoring:
-                    self._health_monitor = BaseHealthMonitor(
-                        buffer_manager=self._buffer_manager,
-                        performance_monitor=self._performance_monitor,
-                        sampling_engine=self._sampling_engine
-                    )
+                    self._health_monitor = BaseHealthMonitor()
+                    
+                    # Register health checks for components
+                    if self._buffer_manager:
+                        self._health_monitor.register_health_check(
+                            'buffer_manager', 
+                            lambda: getattr(self._buffer_manager, 'is_healthy', lambda: True)()
+                        )
+                    if self._performance_monitor:
+                        self._health_monitor.register_health_check(
+                            'performance_monitor', 
+                            lambda: getattr(self._performance_monitor, 'is_healthy', lambda: True)()
+                        )
+                    if self._sampling_engine:
+                        self._health_monitor.register_health_check(
+                            'sampling_engine', 
+                            lambda: getattr(self._sampling_engine, 'is_healthy', lambda: True)()
+                        )
                 
                 self._initialized = True
                 

@@ -6,10 +6,29 @@ import os
 import time
 import logging
 from typing import Dict, Any, Optional
-from kubernetes import client, config
-from kubernetes.client.rest import ApiException
 from .interfaces import IMetadataCollector
 from .models import KubernetesMetadata, SecurityContext
+
+# Optional kubernetes imports
+try:
+    from kubernetes import client, config
+    from kubernetes.client.rest import ApiException
+    KUBERNETES_AVAILABLE = True
+except ImportError:
+    KUBERNETES_AVAILABLE = False
+    # Create dummy classes for when kubernetes is not available
+    class client:
+        class CoreV1Api:
+            pass
+    class config:
+        @staticmethod
+        def load_incluster_config():
+            pass
+        @staticmethod
+        def load_kube_config():
+            pass
+    class ApiException(Exception):
+        pass
 
 
 class KubernetesMetadataCollector(IMetadataCollector):
@@ -58,6 +77,12 @@ class KubernetesMetadataCollector(IMetadataCollector):
     
     def _initialize_k8s_client(self) -> None:
         """Initialize Kubernetes API client"""
+        if not KUBERNETES_AVAILABLE:
+            self.logger.warning("Kubernetes client library not available")
+            self._k8s_client = None
+            self._apps_client = None
+            return
+            
         try:
             # Try in-cluster configuration first
             if self.is_kubernetes_environment():
