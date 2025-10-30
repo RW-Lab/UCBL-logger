@@ -310,7 +310,6 @@ class RuntimeSecurityMonitor:
                 # Check for access to host filesystem
                 {'path': '/host', 'description': 'Host filesystem mount detected'},
                 {'path': '/var/run/docker.sock', 'description': 'Docker socket access detected'},
-                {'path': '/proc/1/root', 'description': 'Host root filesystem access detected'},
                 
                 # Check for privileged device access
                 {'path': '/dev/mem', 'description': 'Physical memory device access'},
@@ -336,6 +335,32 @@ class RuntimeSecurityMonitor:
                     except (PermissionError, FileNotFoundError):
                         # Good - we can't access it
                         pass
+            
+            # Better check: Detect if we're in host PID namespace (real escape indicator)
+            # In a normal container, PID 1 is the container's init process
+            # In host PID namespace or after escape, PID 1 is the host's init
+            try:
+                # Read PID 1's command line
+                with open('/proc/1/cmdline', 'r') as f:
+                    pid1_cmd = f.read().replace('\x00', ' ').strip()
+                
+                # Host init processes (systemd, init, etc.)
+                host_init_indicators = ['/sbin/init', 'systemd', '/lib/systemd/systemd']
+                
+                # Check if PID 1 is a host init process
+                if any(indicator in pid1_cmd for indicator in host_init_indicators):
+                    self._create_security_alert(
+                        alert_type='container_escape_attempt',
+                        severity='CRITICAL',
+                        description='Host PID namespace detected - potential container escape',
+                        source='escape_detector',
+                        metadata={
+                            'pid1_command': pid1_cmd,
+                            'access_time': time.time()
+                        }
+                    )
+            except (PermissionError, FileNotFoundError, OSError):
+                pass
         
         except Exception as e:
             self.logger.debug(f"Error detecting container escape attempts: {e}")
