@@ -55,8 +55,6 @@ jobs:
         echo "Running available tests..."
         pytest tests/test_tracing.py -v --tb=short || echo "Tracing test completed"
         echo "Test execution completed"
-    
-
 
   build:
     needs: test
@@ -116,4 +114,4 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
-      if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
