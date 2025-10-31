@@ -3,7 +3,7 @@
 # UCBLLogger - User-Centric Behavior Logging
 
 ## Overview
-`UCBLLogger` is an advanced logging system designed to handle structured logging for both user and system tasks, with **enhanced EKS (Elastic Kubernetes Service) optimization** for containerized GraphRAG Toolkit applications. This logger helps track various activities, including user-initiated, system-initiated, and composite tasks, providing deep insights into system behavior, suspicious activities, risks, anomalies, and more.
+`UCBLLogger` is an advanced logging system designed to handle structured logging for both user and system tasks, with **enhanced EKS (Elastic Kubernetes Service) optimization** for containerized applications. This logger helps track various activities, including user-initiated, system-initiated, and composite tasks, providing deep insights into system behavior, suspicious activities, risks, anomalies, and more.
 
 The logger incorporates flexible metadata handling, customizable task types, timezone-aware logging, **distributed tracing**, **Kubernetes metadata collection**, **performance monitoring**, **intelligent log sampling**, and **enhanced CloudWatch integration**. This detailed and structured logging allows you to easily debug, analyze user behavior, detect anomalies, and maintain observability in cloud-native environments.
 
@@ -156,7 +156,7 @@ buffer_config = BufferConfig(
 
 # Initialize enhanced EKS logger
 logger = EnhancedEKSLogger(
-    service_name="graphrag-toolkit",
+    service_name="my-application",
     namespace="production",
     enable_tracing=True,
     enable_performance_monitoring=True,
@@ -165,9 +165,9 @@ logger = EnhancedEKSLogger(
 )
 
 # Use with automatic tracing
-correlation_id = logger.start_trace("user_query_processing")
-logger.info("Processing user query", correlation_id=correlation_id, 
-           metadata={"user_id": "12345", "query_type": "semantic_search"})
+correlation_id = logger.start_trace("user_request_processing")
+logger.info("Processing user request", correlation_id=correlation_id, 
+           metadata={"user_id": "12345", "request_type": "data_query"})
 
 # Performance metrics are automatically collected
 logger.log_performance_metrics()
@@ -188,7 +188,7 @@ from ucbl_logger.enhanced import EnhancedEKSLogger
 
 # Configuration from environment variables (set in Kubernetes ConfigMap)
 logger = EnhancedEKSLogger(
-    service_name=os.getenv('SERVICE_NAME', 'graphrag-toolkit'),
+    service_name=os.getenv('SERVICE_NAME', 'my-application'),
     namespace=os.getenv('NAMESPACE', 'default'),
     enable_tracing=os.getenv('UCBL_ENABLE_TRACING', 'true').lower() == 'true',
     enable_performance_monitoring=os.getenv('UCBL_ENABLE_PERFORMANCE_MONITORING', 'true').lower() == 'true',
@@ -492,7 +492,7 @@ UCBL_RETRY_BACKOFF_MULTIPLIER=2.0
 
 # CloudWatch Configuration
 UCBL_ENABLE_CLOUDWATCH=true
-UCBL_CLOUDWATCH_LOG_GROUP=/aws/eks/graphrag-toolkit
+UCBL_CLOUDWATCH_LOG_GROUP=/aws/eks/my-application
 UCBL_CLOUDWATCH_REGION=us-west-2
 UCBL_ENABLE_COMPRESSION=true
 UCBL_BATCH_SIZE=100
@@ -517,7 +517,7 @@ metadata:
   namespace: production
 data:
   # Copy the environment variables above
-  SERVICE_NAME: "graphrag-toolkit"
+  SERVICE_NAME: "my-application"
   UCBL_ENABLE_TRACING: "true"
   # ... (other configuration values)
 ```
@@ -558,7 +558,7 @@ performance_config = PerformanceThresholds(
 
 # CloudWatch optimization
 cloudwatch_config = CloudWatchConfig(
-    log_group="/aws/eks/graphrag-toolkit",
+    log_group="/aws/eks/my-application",
     region="us-west-2",
     enable_compression=True,
     batch_size=500,
@@ -859,10 +859,10 @@ curl localhost:9090/metrics | grep ucbl_logger
 
 The Enhanced UCBLLogger is designed for real-world EKS scenarios. Here are some key use cases covered in our [comprehensive examples](EXAMPLES.md):
 
-### 🔍 GraphRAG Query Processing Service
-Complete logging setup for a GraphRAG service that processes user queries with semantic search, including:
+### 🔍 Data Processing Service
+Complete logging setup for a data processing service that handles user requests, including:
 - Distributed tracing across query processing steps
-- Performance monitoring for embedding generation and vector search
+- Performance monitoring for data processing and query execution
 - Intelligent sampling to control costs while preserving critical logs
 - Error handling and debugging capabilities
 

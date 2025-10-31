@@ -21,7 +21,7 @@ This guide provides comprehensive troubleshooting procedures for common issues w
 
 ```bash
 # Check pod status
-kubectl get pods -l app=graphrag-toolkit
+kubectl get pods -l app=my-application
 
 # Check pod health
 kubectl exec <pod-name> -- curl -f localhost:8080/health
@@ -42,7 +42,7 @@ kubectl get events --sort-by=.metadata.creationTimestamp
 #!/bin/bash
 # quick-status.sh - Quick health check script
 
-POD_NAME=$(kubectl get pods -l app=graphrag-toolkit -o jsonpath='{.items[0].metadata.name}')
+POD_NAME=$(kubectl get pods -l app=my-application -o jsonpath='{.items[0].metadata.name}')
 
 echo "=== Pod Status ==="
 kubectl get pod $POD_NAME
@@ -389,7 +389,7 @@ kubectl exec <pod-name> -- aws sts get-caller-identity
 aws logs describe-log-groups --log-group-name-prefix /aws/eks/
 
 # Check log group existence
-aws logs describe-log-groups --log-group-name-prefix /aws/eks/graphrag-toolkit
+aws logs describe-log-groups --log-group-name-prefix /aws/eks/my-application
 
 # Check delivery metrics
 kubectl logs <pod-name> | grep "cloudwatch_delivery"
@@ -411,7 +411,7 @@ kubectl logs <pod-name> | grep "cloudwatch_delivery"
         "logs:DescribeLogGroups",
         "logs:DescribeLogStreams"
       ],
-      "Resource": "arn:aws:logs:*:*:log-group:/aws/eks/graphrag-toolkit*"
+      "Resource": "arn:aws:logs:*:*:log-group:/aws/eks/my-application*"
     }
   ]
 }
@@ -420,11 +420,11 @@ kubectl logs <pod-name> | grep "cloudwatch_delivery"
 **Create Log Group Manually**
 ```bash
 aws logs create-log-group \
-  --log-group-name /aws/eks/graphrag-toolkit \
+  --log-group-name /aws/eks/my-application \
   --region us-west-2
 
 aws logs put-retention-policy \
-  --log-group-name /aws/eks/graphrag-toolkit \
+  --log-group-name /aws/eks/my-application \
   --retention-in-days 30
 ```
 
@@ -452,7 +452,7 @@ kubectl logs <pod-name> | grep -i "rate.limit\|throttl"
 kubectl logs <pod-name> | grep "delivery_rate"
 
 # Monitor CloudWatch metrics
-aws logs describe-metric-filters --log-group-name /aws/eks/graphrag-toolkit
+aws logs describe-metric-filters --log-group-name /aws/eks/my-application
 ```
 
 #### Solutions
@@ -494,13 +494,13 @@ cloudwatch_config = CloudWatchConfig(
 #### Diagnosis
 ```bash
 # Check log volume
-aws logs describe-log-groups --query 'logGroups[?logGroupName==`/aws/eks/graphrag-toolkit`].storedBytes'
+aws logs describe-log-groups --query 'logGroups[?logGroupName==`/aws/eks/my-application`].storedBytes'
 
 # Check ingestion rate
 kubectl logs <pod-name> | grep "logs_sent_total"
 
 # Analyze log content
-aws logs filter-log-events --log-group-name /aws/eks/graphrag-toolkit --limit 10
+aws logs filter-log-events --log-group-name /aws/eks/my-application --limit 10
 ```
 
 #### Solutions
@@ -526,7 +526,7 @@ cloudwatch_config = CloudWatchConfig(
 **Set Retention Policies**
 ```bash
 aws logs put-retention-policy \
-  --log-group-name /aws/eks/graphrag-toolkit \
+  --log-group-name /aws/eks/my-application \
   --retention-in-days 7  # Reduce from default
 ```
 
@@ -623,7 +623,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: graphrag-toolkit
+      app: my-application
   policyTypes:
   - Egress
   egress:
@@ -765,7 +765,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: graphrag-toolkit
+      app: my-application
   endpoints:
   - port: metrics
     interval: 30s
@@ -777,9 +777,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: graphrag-toolkit-service
+  name: my-application-service
   labels:
-    app: graphrag-toolkit  # Must match ServiceMonitor selector
+    app: my-application  # Must match ServiceMonitor selector
 spec:
   ports:
   - name: metrics
@@ -901,7 +901,7 @@ if __name__ == "__main__":
 #!/bin/bash
 # analyze_logs.sh - Log analysis script
 
-POD_NAME=$(kubectl get pods -l app=graphrag-toolkit -o jsonpath='{.items[0].metadata.name}')
+POD_NAME=$(kubectl get pods -l app=my-application -o jsonpath='{.items[0].metadata.name}')
 
 echo "=== Error Analysis ==="
 kubectl logs $POD_NAME | grep -i error | tail -10
@@ -930,19 +930,19 @@ kubectl logs $POD_NAME | grep "sampling" | tail -5
 echo "Starting emergency recovery..."
 
 # Scale down deployment
-kubectl scale deployment graphrag-toolkit --replicas=0
+kubectl scale deployment my-application --replicas=0
 
 # Wait for pods to terminate
-kubectl wait --for=delete pod -l app=graphrag-toolkit --timeout=60s
+kubectl wait --for=delete pod -l app=my-application --timeout=60s
 
 # Clear any stuck resources
-kubectl delete pod -l app=graphrag-toolkit --force --grace-period=0
+kubectl delete pod -l app=my-application --force --grace-period=0
 
 # Scale back up
-kubectl scale deployment graphrag-toolkit --replicas=3
+kubectl scale deployment my-application --replicas=3
 
 # Wait for pods to be ready
-kubectl wait --for=condition=ready pod -l app=graphrag-toolkit --timeout=300s
+kubectl wait --for=condition=ready pod -l app=my-application --timeout=300s
 
 echo "Emergency recovery completed"
 ```
@@ -960,10 +960,10 @@ kubectl get configmap ucbl-logger-config -o yaml > backup-config-$(date +%Y%m%d-
 kubectl apply -f deployment/kubernetes/configmap.yaml
 
 # Restart deployment
-kubectl rollout restart deployment graphrag-toolkit
+kubectl rollout restart deployment my-application
 
 # Wait for rollout to complete
-kubectl rollout status deployment graphrag-toolkit
+kubectl rollout status deployment my-application
 ```
 
 ### 3. Data Recovery

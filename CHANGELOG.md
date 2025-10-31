@@ -66,7 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This version resolves a critical runtime error in the enhanced EKS logger where the `end_trace()` method was being called with a `metadata` parameter that wasn't properly handled. The fix ensures backward compatibility while adding support for trace metadata.
 
 ### Version 1.0.22
-Major release introducing the Enhanced EKS Logger with enterprise-grade features for Kubernetes deployments. This version provides comprehensive observability, performance monitoring, and cost optimization features specifically designed for containerized GraphRAG applications.
+Major release introducing the Enhanced EKS Logger with enterprise-grade features for Kubernetes deployments. This version provides comprehensive observability, performance monitoring, and cost optimization features specifically designed for containerized applications.
 
 ### Version 1.0.0
 Initial stable release providing core user-centric behavior logging capabilities with structured logging, task tracking, and behavioral analysis features.

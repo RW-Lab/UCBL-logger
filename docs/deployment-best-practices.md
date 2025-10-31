@@ -176,7 +176,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: graphrag-toolkit
+      app: my-application
   policyTypes:
   - Ingress
   - Egress
@@ -240,7 +240,7 @@ security_config = SecurityConfig(
         "logs:PutLogEvents"
       ],
       "Resource": [
-        "arn:aws:logs:*:*:log-group:/aws/eks/graphrag-toolkit:*"
+        "arn:aws:logs:*:*:log-group:/aws/eks/my-application:*"
       ]
     },
     {
@@ -250,7 +250,7 @@ security_config = SecurityConfig(
         "logs:DescribeLogStreams"
       ],
       "Resource": [
-        "arn:aws:logs:*:*:log-group:/aws/eks/graphrag-toolkit"
+        "arn:aws:logs:*:*:log-group:/aws/eks/my-application"
       ]
     }
   ]
@@ -266,7 +266,7 @@ security_config = SecurityConfig(
 ```python
 # Enable async processing for high-throughput scenarios
 logger = EnhancedEKSLogger(
-    service_name="graphrag-toolkit",
+    service_name="my-application",
     async_processing=True,
     worker_threads=4,
     queue_size=10000
@@ -305,12 +305,12 @@ buffer_config = BufferConfig(
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: graphrag-toolkit-pdb
+  name: my-application-pdb
 spec:
   minAvailable: 2
   selector:
     matchLabels:
-      app: graphrag-toolkit
+      app: my-application
 ```
 
 #### Horizontal Pod Autoscaler
@@ -319,12 +319,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: graphrag-toolkit-hpa
+  name: my-application-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: graphrag-toolkit
+    name: my-application
   minReplicas: 3
   maxReplicas: 20
   metrics:
@@ -355,17 +355,17 @@ spec:
 apiVersion: autoscaling.k8s.io/v1
 kind: VerticalPodAutoscaler
 metadata:
-  name: graphrag-toolkit-vpa
+  name: my-application-vpa
 spec:
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: graphrag-toolkit
+    name: my-application
   updatePolicy:
     updateMode: "Auto"
   resourcePolicy:
     containerPolicies:
-    - containerName: graphrag-toolkit
+    - containerName: my-application
       maxAllowed:
         cpu: 4000m
         memory: 8Gi
@@ -493,7 +493,7 @@ groups:
 # Backup Kubernetes configurations
 kubectl get configmap ucbl-logger-config -o yaml > backup/configmap.yaml
 kubectl get secret ucbl-logger-secrets -o yaml > backup/secrets.yaml
-kubectl get deployment graphrag-toolkit -o yaml > backup/deployment.yaml
+kubectl get deployment my-application -o yaml > backup/deployment.yaml
 ```
 
 #### Log Buffer Backup
@@ -517,7 +517,7 @@ buffer_config = BufferConfig(
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: graphrag-toolkit-primary
+  name: my-application-primary
   labels:
     region: us-west-2
     role: primary
@@ -527,7 +527,7 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: graphrag-toolkit-secondary
+  name: my-application-secondary
   labels:
     region: us-east-1
     role: secondary
@@ -715,9 +715,9 @@ strategy:
 #!/bin/bash
 # Blue-green deployment script
 kubectl apply -f deployment-green.yaml
-kubectl wait --for=condition=available deployment/graphrag-toolkit-green
-kubectl patch service graphrag-toolkit -p '{"spec":{"selector":{"version":"green"}}}'
-kubectl delete deployment graphrag-toolkit-blue
+kubectl wait --for=condition=available deployment/my-application-green
+kubectl patch service my-application -p '{"spec":{"selector":{"version":"green"}}}'
+kubectl delete deployment my-application-blue
 ```
 
 ### Configuration Management

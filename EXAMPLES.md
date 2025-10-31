@@ -20,7 +20,7 @@ from ucbl_logger.enhanced import EnhancedEKSLogger
 
 # Minimal setup for EKS environment
 logger = EnhancedEKSLogger(
-    service_name="my-graphrag-service",
+    service_name="my-application",
     namespace="production"
 )
 
@@ -37,7 +37,7 @@ from ucbl_logger.enhanced.config import SamplingConfig, BufferConfig
 # Production configuration
 if os.getenv('ENVIRONMENT') == 'production':
     logger = EnhancedEKSLogger(
-        service_name=os.getenv('SERVICE_NAME', 'graphrag-toolkit'),
+        service_name=os.getenv('SERVICE_NAME', 'my-application'),
         namespace=os.getenv('NAMESPACE', 'production'),
         enable_sampling=True,
         sampling_config=SamplingConfig(
@@ -50,7 +50,7 @@ if os.getenv('ENVIRONMENT') == 'production':
 else:
     # Development configuration - no sampling, more verbose
     logger = EnhancedEKSLogger(
-        service_name=os.getenv('SERVICE_NAME', 'graphrag-toolkit-dev'),
+        service_name=os.getenv('SERVICE_NAME', 'my-application-dev'),
         namespace=os.getenv('NAMESPACE', 'development'),
         enable_sampling=False,
         enable_cloudwatch=False,
@@ -63,18 +63,18 @@ logger.info("Logger configured for environment",
 
 ## Use Case Scenarios
 
-### 1. GraphRAG Query Processing Service
+### 1. Data Processing Service
 
-**Scenario**: A GraphRAG service that processes user queries, performs semantic search, and generates responses. Needs comprehensive logging for debugging, performance monitoring, and cost optimization.
+**Scenario**: A data processing service that handles user requests and generates responses. Needs comprehensive logging for debugging, performance monitoring, and cost optimization.
 
 ```python
 import time
 from ucbl_logger.enhanced import EnhancedEKSLogger
 from ucbl_logger.enhanced.config import SamplingConfig, PerformanceThresholds
 
-# Configure logger for GraphRAG service
+# Configure logger for data processing service
 logger = EnhancedEKSLogger(
-    service_name="graphrag-query-processor",
+    service_name="data-query-processor",
     namespace="ai-platform",
     enable_tracing=True,
     enable_performance_monitoring=True,

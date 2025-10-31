@@ -188,7 +188,7 @@ from ucbl_logger.enhanced.config import CloudWatchConfig
 
 # Cost-optimized CloudWatch configuration
 cloudwatch_config = CloudWatchConfig(
-    log_group="/aws/eks/graphrag-toolkit",
+    log_group="/aws/eks/my-application",
     region="us-west-2",
     enable_compression=True,
     batch_size=1000,
@@ -199,7 +199,7 @@ cloudwatch_config = CloudWatchConfig(
 
 # High-throughput CloudWatch configuration
 cloudwatch_config = CloudWatchConfig(
-    log_group="/aws/eks/graphrag-toolkit",
+    log_group="/aws/eks/my-application",
     region="us-west-2",
     enable_compression=False,
     batch_size=100,
@@ -221,7 +221,7 @@ metadata:
   namespace: production
 data:
   # Service Configuration
-  SERVICE_NAME: "graphrag-toolkit"
+  SERVICE_NAME: "my-application"
   ENVIRONMENT: "production"
   UCBL_LOG_LEVEL: "WARN"
   
@@ -246,7 +246,7 @@ data:
   
   # CloudWatch optimization
   UCBL_ENABLE_CLOUDWATCH: "true"
-  UCBL_CLOUDWATCH_LOG_GROUP: "/aws/eks/graphrag-toolkit-prod"
+  UCBL_CLOUDWATCH_LOG_GROUP: "/aws/eks/my-application-prod"
   UCBL_ENABLE_COMPRESSION: "true"
   UCBL_BATCH_SIZE: "1000"
 ```
@@ -257,7 +257,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: graphrag-toolkit
+  name: my-application
 spec:
   template:
     spec:
@@ -333,16 +333,16 @@ import boto3
 logs_client = boto3.client('logs', region_name='us-west-2')
 
 logs_client.create_log_group(
-    logGroupName='/aws/eks/graphrag-toolkit',
+    logGroupName='/aws/eks/my-application',
     tags={
         'Environment': 'production',
-        'Application': 'graphrag-toolkit',
+        'Application': 'my-application',
         'ManagedBy': 'ucbl-logger'
     }
 )
 
 logs_client.put_retention_policy(
-    logGroupName='/aws/eks/graphrag-toolkit',
+    logGroupName='/aws/eks/my-application',
     retentionInDays=30
 )
 ```
@@ -498,7 +498,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: graphrag-toolkit
+      app: my-application
   endpoints:
   - port: metrics
     interval: 30s
@@ -526,7 +526,7 @@ custom_metrics.define_histogram(
 
 # Use in logger
 logger = EnhancedEKSLogger(
-    service_name="graphrag-toolkit",
+    service_name="my-application",
     custom_metrics=custom_metrics
 )
 
@@ -589,7 +589,7 @@ def get_logger_config():
 ```python
 # Use feature flags for gradual rollout
 logger = EnhancedEKSLogger(
-    service_name="graphrag-toolkit",
+    service_name="my-application",
     enable_tracing=os.getenv('FEATURE_TRACING', 'false').lower() == 'true',
     enable_performance_monitoring=os.getenv('FEATURE_PERF_MON', 'false').lower() == 'true',
     enable_sampling=os.getenv('FEATURE_SAMPLING', 'false').lower() == 'true'
