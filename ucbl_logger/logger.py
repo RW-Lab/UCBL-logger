@@ -201,6 +201,10 @@ class UCBLLogger:
         else:
             self._standard_logger.warning(msg)
     
+    def warn(self, msg: str, **kwargs) -> None:
+        """Alias for warning method"""
+        self.warning(msg, **kwargs)
+    
     def error(self, msg: str, **kwargs) -> None:
         """Log error message with optional enhanced context"""
         if self._enhanced_logger:

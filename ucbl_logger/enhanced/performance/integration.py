@@ -340,6 +340,10 @@ class PerformanceAwareLogger:
         """Log warning message with performance context"""
         self._log_with_performance_context(logging.WARNING, msg, *args, **kwargs)
     
+    def warn(self, msg: str, *args, **kwargs) -> None:
+        """Alias for warning method"""
+        self.warning(msg, *args, **kwargs)
+    
     def error(self, msg: str, *args, **kwargs) -> None:
         """Log error message with performance context"""
         self._log_with_performance_context(logging.ERROR, msg, *args, **kwargs)

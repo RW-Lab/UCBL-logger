@@ -192,6 +192,10 @@ class TracingIntegratedLogger(EnhancedEKSLoggerBase):
         log_entry = self._create_enhanced_log_entry("WARNING", msg, correlation_id, **kwargs)
         self._process_log_entry(log_entry)
     
+    def warn(self, msg: str, correlation_id: Optional[str] = None, **kwargs) -> None:
+        """Alias for warning method"""
+        self.warning(msg, correlation_id, **kwargs)
+    
     def error(self, msg: str, correlation_id: Optional[str] = None, **kwargs) -> None:
         """Log error message with enhanced context"""
         log_entry = self._create_enhanced_log_entry("ERROR", msg, correlation_id, **kwargs)

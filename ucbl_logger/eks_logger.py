@@ -48,6 +48,13 @@ class EKSLogger:
     def critical(self, msg: str, **kwargs) -> None:
         self._log_structured("CRITICAL", msg, **kwargs)
     
+    def warning(self, msg: str, **kwargs) -> None:
+        self._log_structured("WARNING", msg, **kwargs)
+    
+    def warn(self, msg: str, **kwargs) -> None:
+        """Alias for warning method"""
+        self.warning(msg, **kwargs)
+    
     def log_task_start(self, task_name: str, task_type: str = "System", **kwargs) -> None:
         self._log_structured("INFO", f"Task started: {task_name}", 
                            task_name=task_name, task_type=task_type, 

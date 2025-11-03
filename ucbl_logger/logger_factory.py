@@ -71,6 +71,10 @@ class CompleteLogger:
     def warning(self, message: str) -> None:
         self._core.log(LogLevel.WARNING, message)
     
+    def warn(self, message: str) -> None:
+        """Alias for warning method"""
+        self.warning(message)
+    
     def error(self, message: str) -> None:
         self._core.log(LogLevel.ERROR, message)
     
