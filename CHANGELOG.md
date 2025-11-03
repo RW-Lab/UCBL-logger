@@ -5,6 +5,22 @@ All notable changes to UCBLLogger will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-12-19
+
+### Added
+- Added missing `warn()` method aliases to all logger classes for full Python logging compatibility
+- Enhanced logger compatibility with standard logging conventions
+
+### Fixed
+- Fixed missing `warn()` and `warning()` methods in `ucbl_logger/eks_logger.py`
+- Added `warn()` aliases to all enhanced logger implementations
+- Improved consistency across all logger interfaces
+
+### Changed
+- Anonymized all documentation to remove specific application references
+- Updated README.md, EXAMPLES.md, and docs/ to use generic application names
+- Improved documentation consistency and reusability
+
 ## [1.0.29] - 2024-12-19
 
 ### Fixed
