@@ -18,6 +18,74 @@ The enhanced UCBLLogger provides enterprise-grade logging capabilities optimized
 - **☁️ CloudWatch Optimization**: Efficient batching, compression, and cost optimization
 - **🔒 Enhanced Security**: Container security context monitoring and sensitive data redaction
 - **💚 Health Monitoring**: Comprehensive health checks and system status reporting
+
+## 🐳 AWS Fargate Support (v1.2.0)
+
+The `FargateLogger` provides structured JSON logging optimized for AWS Fargate (ECS) environments:
+
+- **📦 ECS Metadata Enrichment**: Automatically fetches task ARN, cluster, service, container from the Task Metadata Endpoint v4
+- **📤 Structured JSON to stdout**: Compatible with awslogs driver and FireLens (Fluent Bit)
+- **🏷️ Zero Configuration**: Auto-detects Fargate environment via `ECS_CONTAINER_METADATA_URI_V4`
+- **⚡ Cached Metadata**: Single fetch, cached for task lifetime (no repeated HTTP calls)
+- **🔄 Context Propagation**: `with_context()` returns a new logger with additional static fields
+
+### Quick Start (Fargate)
+
+```python
+from ucbl_logger import FargateLogger, FargateLoggerFactory
+
+# Simple usage
+logger = FargateLogger(service_name="my-api")
+logger.info("Request processed", request_id="abc123", duration_ms=42)
+
+# Auto-configured from environment variables
+logger = FargateLoggerFactory.create_from_environment()
+
+# With additional context
+auth_logger = logger.with_context(user_id="u-123", session="s-456")
+auth_logger.info("User authenticated")
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `UCBL_SERVICE_NAME` | ucbl-service | Service name in log entries |
+| `UCBL_LOG_LEVEL` | INFO | Minimum log level |
+| `UCBL_INCLUDE_METADATA` | true | Enrich with ECS task metadata |
+
+### Output Format
+
+```json
+{
+  "timestamp": "2026-05-31T13:00:00+00:00",
+  "level": "INFO",
+  "service": "my-api",
+  "message": "Request processed",
+  "ecs": {
+    "cluster": "my-cluster",
+    "task_arn": "arn:aws:ecs:us-east-1:123456:task/my-cluster/abc123",
+    "task_definition": "my-api:42",
+    "container": "app",
+    "launch_type": "FARGATE",
+    "az": "us-east-1a"
+  },
+  "aws": {
+    "account_id": "123456789012",
+    "region": "us-east-1"
+  },
+  "context": {
+    "request_id": "abc123",
+    "duration_ms": 42
+  }
+}
+```
+
+### Installation
+
+```bash
+pip install ucbl-logger[fargate]
+```
 - **🔄 Robust Error Handling**: Advanced retry mechanisms and graceful failure handling
 
 ---

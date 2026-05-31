@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.2.0 (2026-05-31)
+
+### Added
+- **AWS Fargate Provider** — `FargateLogger` for ECS Fargate environments
+- **Fargate Metadata Collector** — fetches task/container metadata from ECS Task Metadata Endpoint v4
+- **FargateLoggerFactory** — `create_logger()` and `create_from_environment()` factory methods
+- **Interfaces** — `IContainerMetadataCollector` (generic), `IFargateMetadataCollector` (Fargate-specific)
+- **Models** — `FargateTaskMetadata`, `FargateContainerMetadata`, `FargateRuntimeContext` (frozen dataclasses)
+- **Optional dependency group** — `pip install ucbl-logger[fargate]`
+
+### Architecture
+- Follows SOLID principles throughout
+- SRP: Collector collects, Logger logs, Factory creates
+- OCP: New Fargate classes extend without modifying EKS code
+- ISP: Separate interfaces for generic container vs Fargate-specific
+- DIP: Logger depends on abstractions, not concrete implementations
+
+
 All notable changes to UCBLLogger will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
