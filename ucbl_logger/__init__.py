@@ -28,6 +28,11 @@ except ImportError:
 
 __all__ = ['UCBLLogger', 'UCBLLoggerFactory', 'LogLevel', 'ILogger', 'ITaskLogger', 'IRiskLogger']
 
+# Fargate logger (always available — no heavy dependencies)
+from .fargate_logger import FargateLogger
+from .enhanced.factory import FargateLoggerFactory
+__all__.extend(['FargateLogger', 'FargateLoggerFactory'])
+
 # Add enhanced components to __all__ if available
 if _enhanced_available:
     __all__.extend([

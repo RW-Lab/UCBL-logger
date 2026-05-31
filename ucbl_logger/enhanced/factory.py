@@ -259,3 +259,51 @@ class EnhancedEKSLoggerFactory:
         )
         
         return EnhancedEKSLoggerFactory.create_logger(config)
+
+
+class FargateLoggerFactory:
+    """Factory for creating Fargate-optimized loggers.
+
+    Follows Factory Method pattern — encapsulates logger creation
+    with sensible defaults for AWS Fargate environments.
+    """
+
+    @staticmethod
+    def create_logger(
+        service_name: str = "ucbl-service",
+        log_level: str = "INFO",
+        include_metadata: bool = True,
+    ) -> "FargateLogger":
+        """Create a Fargate logger instance.
+
+        Args:
+            service_name: Application/service name.
+            log_level: Minimum log level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+            include_metadata: Enrich with ECS task metadata.
+
+        Returns:
+            Configured FargateLogger instance.
+        """
+        from ..fargate_logger import FargateLogger
+        return FargateLogger(
+            service_name=service_name,
+            log_level=log_level,
+            include_metadata=include_metadata,
+        )
+
+    @staticmethod
+    def create_from_environment() -> "FargateLogger":
+        """Create a Fargate logger auto-configured from environment variables.
+
+        Reads:
+            UCBL_SERVICE_NAME: Service name (default: ucbl-service)
+            UCBL_LOG_LEVEL: Log level (default: INFO)
+            UCBL_INCLUDE_METADATA: Include ECS metadata (default: true)
+        """
+        import os
+        from ..fargate_logger import FargateLogger
+        return FargateLogger(
+            service_name=os.environ.get("UCBL_SERVICE_NAME", "ucbl-service"),
+            log_level=os.environ.get("UCBL_LOG_LEVEL", "INFO"),
+            include_metadata=os.environ.get("UCBL_INCLUDE_METADATA", "true").lower() == "true",
+        )
